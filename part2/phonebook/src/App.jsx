@@ -26,7 +26,17 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     if ((persons.filter(person => person.name === newName)).length > 0) {
-      alert(`A person with the name "${newName}" already exists in the phonebook`)
+      if (window.confirm(`A user with this name already exists. Do you want to replace the old number with a new one?`)) {
+        const contact = persons.find(person => person.name === newName)
+        const changedContact = { ...contact, number: newNumber}
+        personService
+          .update(contact.id, changedContact)
+          .then(returnedContact => {
+            setPersons(persons.map(person => person.name !== newName ? person : returnedContact.data))
+            setNewName('')
+            setNewNumber('')
+          })
+      }
     } else {
       const formData = {
         name: newName,
@@ -49,8 +59,8 @@ const App = () => {
     person.name.toLowerCase().match(newFilter.toLowerCase())
     )
  
-  const deleteContact = (id) => {
-    if (window.confirm("test")) {
+  const deleteContact = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
       personService
         .remove(id)
       personService
@@ -84,7 +94,7 @@ const App = () => {
         {filteredPersons.map(person =>
           <li key={person.name}>
               {person.name} {person.number}
-              <button onClick={() => deleteContact(person.id)}>Delete</button>
+              <button onClick={() => deleteContact(person.id, person.name)}>Delete</button>
           </li> 
         )}
       </ul>
