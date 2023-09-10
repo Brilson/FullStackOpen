@@ -10,6 +10,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [newFilter, setNewFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const handleAddName = (event) => {
     setNewName(event.target.value)
@@ -35,6 +37,17 @@ const App = () => {
             setPersons(persons.map(person => person.name !== newName ? person : returnedContact.data))
             setNewName('')
             setNewNumber('')
+            setSuccessMessage(`The number for ${newName} was successfully updated`)
+            setTimeout(() => {
+              setSuccessMessage(null)
+            }, 5000)
+          })
+          .catch(error => {
+            setErrorMessage('Something went wrong')
+            setTimeout(() => {
+              setErrorMessage(null)
+            }, 5000)
+            setPersons(persons.filter(person => person.id !== contact.id))
           })
       }
     } else {
@@ -49,6 +62,12 @@ const App = () => {
           setPersons(persons.concat(response.data))
           setNewName('')
           setNewNumber('')
+          setSuccessMessage(
+            `${newName} was successfully added.`
+          )
+          setTimeout(() => {
+            setSuccessMessage(null)
+          }, 5000)
         })
 
       
@@ -81,24 +100,62 @@ const App = () => {
       })
   }, [])
   
+  const Success = ({ message }) => {
+    if (message === null) {
+      return null
+    }
   
+    return (
+      <div className='success'>
+        {message}
+      </div>
+    )
+  }
+
+  const Error = ({ message }) => {
+    if (message === null) {
+      return null
+    }
+  
+    return (
+      <div className='error'>
+        {message}
+      </div>
+    )
+  }
+
+  const Footer = () => {
+    const footerStyle = {
+      color: 'green',
+      fontStyle: 'italic',
+      fontSize: 16
+    }
+    return (
+      <div style={footerStyle}>
+      <br />
+      <em>Note app, Department of Computer Science, University of Helsinki 2023</em>
+    </div>
+    )
+  }
 
 
   return (
     <div>
       <Search newFilter={newFilter} handleAddFilter={handleAddFilter}/>
-      <h2>Add a Contact</h2>
+      <h1>Add a Contact</h1>
+      <Success message={successMessage} />
+      <Error message={errorMessage} />
       <Form addPerson={addPerson} newName={newName} handleAddName={handleAddName} newNumber={newNumber} handleAddNumber={handleAddNumber} />    
-      <h2>Numbers</h2>
+      <h1>Numbers</h1>
       <ul>
         {filteredPersons.map(person =>
-          <li key={person.name}>
+          <li className='contact' key={person.name}>
               {person.name} {person.number}
               <button onClick={() => deleteContact(person.id, person.name)}>Delete</button>
           </li> 
         )}
       </ul>
-      
+      <Footer />
     </div>
   )
 }

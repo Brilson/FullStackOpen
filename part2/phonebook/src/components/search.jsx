@@ -1,7 +1,7 @@
 const Search = ( props ) => {  
     return (
         <>
-            <h2>Phonebook</h2>
+            <h1>Phonebook</h1>
             <div>
                 Filter for names with: 
                 <input 
